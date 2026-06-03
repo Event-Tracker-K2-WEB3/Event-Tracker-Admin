@@ -1,0 +1,46 @@
+import type { ReactNode } from "react";
+import {
+  Layout,
+  AppBar,
+  TitlePortal,
+  CheckForApplicationUpdate,
+} from "react-admin";
+import { Box, Typography } from "@mui/material";
+
+function AdminAppBar() {
+  return (
+    <AppBar color="primary">
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+          gap: 2,
+        }}
+      >
+        <Typography
+          variant="h6"
+          color="inherit"
+          sx={{
+            flex: 1,
+            fontWeight: 800,
+            letterSpacing: "-0.03em",
+          }}
+        >
+          EventSync Admin
+        </Typography>
+
+        <TitlePortal />
+      </Box>
+    </AppBar>
+  );
+}
+
+export function AdminLayout({ children }: { children: ReactNode }) {
+  return (
+    <Layout appBar={AdminAppBar}>
+      {children}
+      <CheckForApplicationUpdate />
+    </Layout>
+  );
+}
