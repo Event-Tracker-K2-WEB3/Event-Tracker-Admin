@@ -68,7 +68,17 @@ export function AdminDashboard() {
     <Box sx={{ p: 3 }}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" fontWeight={800}>
-          EventSync Admin
+        <div className="logo" style={{ display: "flex", alignItems: "center" }}>
+            <img src="public/logo-event-tracker.png" alt=""
+              style={{
+                height: "1.5em",
+                marginRight: "0.5em",
+              }}
+            />
+            <span>
+              EventSync Admin
+            </span>
+          </div>
         </Typography>
 
         <Typography color="text.secondary" sx={{ mt: 1 }}>

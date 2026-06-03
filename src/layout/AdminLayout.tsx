@@ -27,7 +27,17 @@ function AdminAppBar() {
             letterSpacing: "-0.03em",
           }}
         >
-          EventSync Admin
+          <div className="logo" style={{ display: "flex", alignItems: "center" }}>
+            <img src="public/logo-event-tracker.png" alt=""
+              style={{
+                height: "1.5em",
+                marginRight: "0.5em",
+              }}
+            />
+            <span>
+              EventSync Admin
+            </span>
+          </div>
         </Typography>
 
         <TitlePortal />

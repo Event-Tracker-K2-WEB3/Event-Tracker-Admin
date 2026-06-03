@@ -1,6 +1,6 @@
-import { defaultDarkTheme } from "react-admin";
+import { defaultDarkTheme, type RaThemeOptions } from "react-admin";
 
-export const eventSyncTheme = {
+export const eventSyncTheme: RaThemeOptions = {
   ...defaultDarkTheme,
 
   palette: {
@@ -34,15 +34,6 @@ export const eventSyncTheme = {
 
   typography: {
     fontFamily: "Roboto, Arial, sans-serif",
-    h4: {
-      fontWeight: 800,
-    },
-    h5: {
-      fontWeight: 700,
-    },
-    h6: {
-      fontWeight: 700,
-    },
   },
 
   components: {
