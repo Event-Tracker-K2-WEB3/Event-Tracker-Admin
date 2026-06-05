@@ -1,22 +1,44 @@
-import type { DataProvider, DeleteParams, RaRecord } from "react-admin";
+import {
+  type DataProvider,
+  type DeleteParams,
+  type GetManyReferenceParams,
+  type GetManyReferenceResult,
+  type RaRecord,
+  HttpError,
+} from "react-admin";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
-async function httpClient(url: string, options: RequestInit = {}) {
+type SpringPageResponse<RecordType extends RaRecord = RaRecord> = {
+  content?: RecordType[];
+  totalElements?: number;
+};
+
+function getAuthHeaders(): HeadersInit {
   const token = localStorage.getItem("eventsync_admin_token");
 
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+  };
+}
+
+async function httpClient(url: string, options: RequestInit = {}) {
   const response = await fetch(url, {
     ...options,
     headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...getAuthHeaders(),
       ...(options.headers || {}),
     },
   });
 
   if (!response.ok) {
     const message = await response.text();
-    throw new Error(message || `HTTP error ${response.status}`);
+
+    throw new HttpError(
+      message || `HTTP error ${response.status}`,
+      response.status
+    );
   }
 
   if (response.status === 204) {
@@ -26,7 +48,12 @@ async function httpClient(url: string, options: RequestInit = {}) {
   return response.json();
 }
 
-function normalizeListResponse(response: any) {
+function normalizeListResponse<RecordType extends RaRecord = RaRecord>(
+  response: SpringPageResponse<RecordType> | RecordType[]
+): {
+  data: RecordType[];
+  total: number;
+} {
   if (Array.isArray(response)) {
     return {
       data: response,
@@ -40,15 +67,41 @@ function normalizeListResponse(response: any) {
   };
 }
 
+function buildListUrl(
+  resource: string,
+  page: number,
+  perPage: number,
+  filter?: Record<string, unknown>
+) {
+  const params = new URLSearchParams();
+
+  /*
+    Important :
+    Ton backend EventService fait déjà PageRequest.of(page - 1, size).
+    Donc ici, on envoie page=1, page=2, etc.
+    Il ne faut pas envoyer page - 1.
+  */
+  params.set("page", String(page));
+  params.set("size", String(perPage));
+
+  if (filter) {
+    Object.entries(filter).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        params.set(key, String(value));
+      }
+    });
+  }
+
+  return `${API_URL}/${resource}?${params.toString()}`;
+}
+
 export const dataProvider: DataProvider = {
   getList: async (resource, params) => {
     try {
       const page = params.pagination?.page || 1;
       const perPage = params.pagination?.perPage || 10;
 
-      const springPage = page - 1;
-
-      const url = `${API_URL}/${resource}?page=${springPage}&size=${perPage}`;
+      const url = buildListUrl(resource, page, perPage, params.filter);
       const response = await httpClient(url);
 
       return normalizeListResponse(response);
@@ -103,9 +156,9 @@ export const dataProvider: DataProvider = {
     }
   },
 
-  delete: async <RecordType extends RaRecord = any>(
+  delete: async <RecordType extends RaRecord = RaRecord>(
     resource: string,
-    params: DeleteParams<RecordType>,
+    params: DeleteParams<RecordType>
   ) => {
     try {
       await httpClient(`${API_URL}/${resource}/${params.id}`, {
@@ -124,37 +177,79 @@ export const dataProvider: DataProvider = {
   getMany: async (resource, params) => {
     try {
       const data = await Promise.all(
-        params.ids.map((id) => httpClient(`${API_URL}/${resource}/${id}`)),
+        params.ids.map((id) => httpClient(`${API_URL}/${resource}/${id}`))
       );
 
-      return { data };
+      return {
+        data,
+      };
     } catch (error) {
       console.error(`Error fetching many ${resource}`, error);
       throw error;
     }
   },
 
-  getManyReference: async (resource, params) => {
+  getManyReference: async <RecordType extends RaRecord = RaRecord>(
+    resource: string,
+    params: GetManyReferenceParams
+  ): Promise<GetManyReferenceResult<RecordType>> => {
     try {
       const page = params.pagination?.page || 1;
       const perPage = params.pagination?.perPage || 10;
-      const springPage = page - 1;
-
-      const url = `${API_URL}/${resource}?page=${springPage}&size=${perPage}`;
+  
+      const filter = {
+        ...params.filter,
+        [params.target]: params.id,
+      };
+  
+      const url = buildListUrl(resource, page, perPage, filter);
       const response = await httpClient(url);
-
-      return normalizeListResponse(response);
+  
+      return normalizeListResponse<RecordType>(
+        response as SpringPageResponse<RecordType> | RecordType[]
+      );
     } catch (error) {
       console.error(`Error fetching references for ${resource}`, error);
       throw error;
     }
   },
 
-  updateMany: async () => {
-    throw new Error("updateMany is not implemented yet");
+  updateMany: async (resource, params) => {
+    try {
+      const responses = await Promise.all(
+        params.ids.map((id) =>
+          httpClient(`${API_URL}/${resource}/${id}`, {
+            method: "PUT",
+            body: JSON.stringify(params.data),
+          })
+        )
+      );
+
+      return {
+        data: responses.map((response) => response.id),
+      };
+    } catch (error) {
+      console.error(`Error updating many ${resource}`, error);
+      throw error;
+    }
   },
 
-  deleteMany: async () => {
-    throw new Error("deleteMany is not implemented yet");
+  deleteMany: async (resource, params) => {
+    try {
+      await Promise.all(
+        params.ids.map((id) =>
+          httpClient(`${API_URL}/${resource}/${id}`, {
+            method: "DELETE",
+          })
+        )
+      );
+
+      return {
+        data: params.ids,
+      };
+    } catch (error) {
+      console.error(`Error deleting many ${resource}`, error);
+      throw error;
+    }
   },
 };
