@@ -3,7 +3,7 @@ import EventIcon from "@mui/icons-material/Event";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
 import ViewTimelineIcon from "@mui/icons-material/ViewTimeline";
-
+import { authProvider } from "./auth/authProvider";
 import { dataProvider } from "./dataProvider/dataProvider";
 import { AdminDashboard } from "./layout/AdminDashboard";
 import { AdminLayout } from "./layout/AdminLayout";
@@ -13,6 +13,7 @@ export const App = () => (
   <Admin
     dataProvider={dataProvider}
     dashboard={AdminDashboard}
+    authProvider={authProvider}
     layout={AdminLayout}
     theme={eventSyncTheme}
   >
