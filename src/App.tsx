@@ -8,6 +8,10 @@ import { dataProvider } from "./dataProvider/dataProvider";
 import { AdminDashboard } from "./layout/AdminDashboard";
 import { AdminLayout } from "./layout/AdminLayout";
 import { eventSyncTheme } from "./theme";
+import { SessionList } from "./resources/sessions/SessionList";
+import { SessionCreate } from "./resources/sessions/SessionCreate";
+import { SessionEdit } from "./resources/sessions/SessionEdit";
+import { SessionShow } from "./resources/sessions/SessionShow";
 
 export const App = () => (
   <Admin
@@ -19,6 +23,13 @@ export const App = () => (
     <Resource name="events" list={ListGuesser} icon={EventIcon} />
     <Resource name="rooms" list={ListGuesser} icon={MeetingRoomIcon} />
     <Resource name="speakers" list={ListGuesser} icon={RecordVoiceOverIcon} />
-    <Resource name="sessions" list={ListGuesser} icon={ViewTimelineIcon} />
+    <Resource
+      name="sessions"
+      list={SessionList}
+      create={SessionCreate}
+      edit={SessionEdit}
+      show={SessionShow}
+      icon={ViewTimelineIcon}
+    />
   </Admin>
 );
