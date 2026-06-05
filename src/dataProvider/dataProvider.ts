@@ -48,6 +48,24 @@ async function httpClient(url: string, options: RequestInit = {}) {
   return response.json();
 }
 
+function transformDates(data: any, resource: string): any {
+
+  if (resource !== 'events') {
+    return data;
+  }
+
+  const transformed = { ...data };
+
+  if (transformed.startDate) {
+    transformed.startDate = new Date(transformed.startDate).toISOString();
+  }
+  if (transformed.endDate) {
+    transformed.endDate = new Date(transformed.endDate).toISOString();
+  }
+
+  return transformed;
+}
+
 function normalizeListResponse<RecordType extends RaRecord = RaRecord>(
   response: SpringPageResponse<RecordType> | RecordType[]
 ): {
@@ -126,6 +144,9 @@ export const dataProvider: DataProvider = {
 
   create: async (resource, params) => {
     try {
+
+      const data = transformDates(params.data, resource);
+
       const response = await httpClient(`${API_URL}/${resource}`, {
         method: "POST",
         body: JSON.stringify(params.data),
@@ -142,6 +163,9 @@ export const dataProvider: DataProvider = {
 
   update: async (resource, params) => {
     try {
+
+      const data = transformDates(params.data, resource);
+
       const response = await httpClient(`${API_URL}/${resource}/${params.id}`, {
         method: "PUT",
         body: JSON.stringify(params.data),
@@ -196,15 +220,15 @@ export const dataProvider: DataProvider = {
     try {
       const page = params.pagination?.page || 1;
       const perPage = params.pagination?.perPage || 10;
-  
+
       const filter = {
         ...params.filter,
         [params.target]: params.id,
       };
-  
+
       const url = buildListUrl(resource, page, perPage, filter);
       const response = await httpClient(url);
-  
+
       return normalizeListResponse<RecordType>(
         response as SpringPageResponse<RecordType> | RecordType[]
       );
