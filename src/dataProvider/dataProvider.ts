@@ -184,7 +184,7 @@ export const dataProvider: DataProvider = {
     resource: string,
     params: DeleteParams<RecordType>
   ) => {
-    try {rc/dataProvider/dataProvider.ts
+    try {
       
       if (resource === 'rooms') {
         const confirmed = window.confirm(
