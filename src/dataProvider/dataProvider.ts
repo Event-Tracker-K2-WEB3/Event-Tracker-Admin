@@ -185,6 +185,19 @@ export const dataProvider: DataProvider = {
     params: DeleteParams<RecordType>
   ) => {
     try {
+      
+      if (resource === 'rooms') {
+        const confirmed = window.confirm(
+          `⚠️ Warning: Deleting this room will also delete ALL sessions associated with it.\n\nAre you sure you want to continue?`
+        );
+
+        if (!confirmed) {
+          return {
+            data: params.previousData || ({ id: params.id } as RecordType),
+          };
+        }
+      }
+
       await httpClient(`${API_URL}/${resource}/${params.id}`, {
         method: "DELETE",
       });
