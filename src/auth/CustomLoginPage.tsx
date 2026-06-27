@@ -160,7 +160,7 @@ export function CustomLoginPage() {
   const login = useLogin();
   const notify = useNotify();
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -170,9 +170,9 @@ export function CustomLoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login({ username, password });
+      await login({ email, password });
     } catch {
-      notify("Invalid username or password", { type: "error" });
+      notify("Invalid email or password", { type: "error" });
       setIsSubmitting(false);
     }
   };
@@ -210,15 +210,15 @@ export function CustomLoginPage() {
 
         <form onSubmit={handleSubmit} className="login-form">
           <label>
-            Username
+            Email
             <div className="login-input-wrapper">
               <span>♙</span>
               <input
-                value={username}
-                onChange={(event) => setUsername(event.target.value)}
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
                 type="text"
-                placeholder="Enter your username"
-                autoComplete="username"
+                placeholder="Enter your email"
+                autoComplete="email"
                 required
               />
             </div>
