@@ -1,7 +1,6 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useState, MouseEvent } from "react";
 import { useLogin, useNotify } from "react-admin";
 import "./CustomLoginPage.css";
-import { FormEvent, MouseEvent, useEffect, useState } from "react";
 
 function useCountUp(target: number, duration = 1600) {
   const [value, setValue] = useState(0);
@@ -238,14 +237,10 @@ export function CustomLoginPage() {
                 required
               />
 
-              <button
-                type="button"
-                className="password-toggle"
+              <PasswordEyeToggle
+                isOpen={showPassword}
                 onClick={() => setShowPassword((current) => !current)}
-                aria-label="Toggle password visibility"
-              >
-                {showPassword ? "🙈" : "👁"}
-              </button>
+              />
             </div>
           </label>
 
