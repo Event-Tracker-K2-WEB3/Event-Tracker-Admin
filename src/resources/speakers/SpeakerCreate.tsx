@@ -2,17 +2,17 @@ import { Create, SimpleForm, TextInput, required } from "react-admin";
 
 export function SpeakerCreate() {
   return (
-    <Create title="Create speaker">
+    <Create title="Create speaker" redirect="list">
       <SimpleForm>
         <TextInput source="name" label="Name" validate={required()} fullWidth />
         <TextInput source="role" label="Role" validate={required()} fullWidth />
-        <TextInput source="specialty" label="Specialty" fullWidth />
-        <TextInput source="company" label="Company" fullWidth />
+        <TextInput source="specialty" label="Specialty" validate={required()} fullWidth />
+        <TextInput source="company" label="Company" validate={required()} fullWidth />
 
         <TextInput source="bio" label="Bio" multiline rows={5} fullWidth />
 
         <TextInput source="photo" label="Photo URL" fullWidth />
-        <TextInput source="initials" label="Initials" fullWidth />
+        <TextInput source="initials" label="Initials" validate={required()} fullWidth />
 
         <TextInput source="linkedin" label="LinkedIn" fullWidth />
         <TextInput source="twitter" label="Twitter" fullWidth />

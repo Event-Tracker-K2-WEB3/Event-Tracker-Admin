@@ -2,7 +2,7 @@ import { Edit, SimpleForm, TextInput, required } from "react-admin";
 
 export function SpeakerEdit() {
   return (
-    <Edit title="Edit speaker">
+    <Edit title="Edit speaker" redirect="list">
       <SimpleForm>
         <TextInput source="name" label="Name" validate={required()} fullWidth />
         <TextInput source="role" label="Role" validate={required()} fullWidth />

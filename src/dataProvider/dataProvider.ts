@@ -48,22 +48,81 @@ async function httpClient(url: string, options: RequestInit = {}) {
   return response.json();
 }
 
-function transformDates(data: any, resource: string): any {
+function toIsoDateTime(value: unknown) {
+  if (!value) {
+    return null;
+  }
 
-  if (resource !== 'events') {
+  if (value instanceof Date) {
+    return value.toISOString();
+  }
+
+  if (typeof value === "string") {
+    return new Date(value).toISOString();
+  }
+
+  return value;
+}
+
+function removeEmptyValues(data: Record<string, unknown>) {
+  return Object.fromEntries(
+    Object.entries(data).filter(([, value]) => value !== undefined)
+  );
+}
+
+function transformData(data: any, resource: string): any {
+  if (!data) {
     return data;
   }
 
-  const transformed = { ...data };
-
-  if (transformed.startDate) {
-    transformed.startDate = new Date(transformed.startDate).toISOString();
+  if (resource === "events") {
+    return removeEmptyValues({
+      title: data.title,
+      description: data.description,
+      startDate: toIsoDateTime(data.startDate),
+      endDate: toIsoDateTime(data.endDate),
+      location: data.location,
+    });
   }
-  if (transformed.endDate) {
-    transformed.endDate = new Date(transformed.endDate).toISOString();
+
+  if (resource === "sessions") {
+    return removeEmptyValues({
+      title: data.title,
+      description: data.description,
+      type: data.type,
+      startTime: toIsoDateTime(data.startTime),
+      endTime: toIsoDateTime(data.endTime),
+      capacity: data.capacity,
+      image: data.image,
+      eventId: data.eventId,
+      roomId: data.roomId,
+    });
   }
 
-  return transformed;
+  if (resource === "rooms") {
+    return removeEmptyValues({
+      name: data.name,
+    });
+  }
+
+  if (resource === "speakers") {
+    return removeEmptyValues({
+      name: data.name,
+      role: data.role,
+      specialty: data.specialty,
+      company: data.company,
+      bio: data.bio,
+      photo: data.photo,
+      initials: data.initials,
+      linkedin: data.linkedin,
+      twitter: data.twitter,
+      website: data.website,
+      day: data.day,
+      sessionType: data.sessionType,
+    });
+  }
+
+  return data;
 }
 
 function normalizeListResponse<RecordType extends RaRecord = RaRecord>(
@@ -93,14 +152,17 @@ function buildListUrl(
 ) {
   const params = new URLSearchParams();
 
+  const safePage = Math.max(page || 1, 1);
+  const safePerPage = Math.max(perPage || 10, 1);
+
   /*
-    Important :
-    Ton backend EventService fait déjà PageRequest.of(page - 1, size).
-    Donc ici, on envoie page=1, page=2, etc.
-    Il ne faut pas envoyer page - 1.
+    Important:
+    EventService côté backend fait déjà PageRequest.of(page - 1, size).
+    Donc côté React Admin, on envoie page=1, page=2, etc.
+    On n'envoie pas page - 1 ici.
   */
-  params.set("page", String(page));
-  params.set("size", String(perPage));
+  params.set("page", String(safePage));
+  params.set("size", String(safePerPage));
 
   if (filter) {
     Object.entries(filter).forEach(([key, value]) => {
@@ -144,12 +206,11 @@ export const dataProvider: DataProvider = {
 
   create: async (resource, params) => {
     try {
-
-      const data = transformDates(params.data, resource);
+      const data = transformData(params.data, resource);
 
       const response = await httpClient(`${API_URL}/${resource}`, {
         method: "POST",
-        body: JSON.stringify(params.data),
+        body: JSON.stringify(data),
       });
 
       return {
@@ -163,12 +224,11 @@ export const dataProvider: DataProvider = {
 
   update: async (resource, params) => {
     try {
-
-      const data = transformDates(params.data, resource);
+      const data = transformData(params.data, resource);
 
       const response = await httpClient(`${API_URL}/${resource}/${params.id}`, {
         method: "PUT",
-        body: JSON.stringify(params.data),
+        body: JSON.stringify(data),
       });
 
       return {
@@ -185,10 +245,9 @@ export const dataProvider: DataProvider = {
     params: DeleteParams<RecordType>
   ) => {
     try {
-      
-      if (resource === 'rooms') {
+      if (resource === "rooms") {
         const confirmed = window.confirm(
-          `⚠️ Warning: Deleting this room will also delete ALL sessions associated with it.\n\nAre you sure you want to continue?`
+          "⚠️ Warning: Deleting this room may also affect sessions associated with it.\n\nAre you sure you want to continue?"
         );
 
         if (!confirmed) {
@@ -253,17 +312,19 @@ export const dataProvider: DataProvider = {
 
   updateMany: async (resource, params) => {
     try {
-      const responses = await Promise.all(
-        params.ids.map((id) =>
-          httpClient(`${API_URL}/${resource}/${id}`, {
+      await Promise.all(
+        params.ids.map((id) => {
+          const data = transformData(params.data, resource);
+
+          return httpClient(`${API_URL}/${resource}/${id}`, {
             method: "PUT",
-            body: JSON.stringify(params.data),
-          })
-        )
+            body: JSON.stringify(data),
+          });
+        })
       );
 
       return {
-        data: responses.map((response) => response.id),
+        data: params.ids,
       };
     } catch (error) {
       console.error(`Error updating many ${resource}`, error);
