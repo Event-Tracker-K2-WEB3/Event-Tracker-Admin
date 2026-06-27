@@ -1,4 +1,4 @@
-import { Admin, Resource, ListGuesser } from "react-admin";
+import { Admin, Resource} from "react-admin";
 import EventIcon from "@mui/icons-material/Event";
 import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
 import RecordVoiceOverIcon from "@mui/icons-material/RecordVoiceOver";
@@ -28,9 +28,11 @@ import { SessionList } from "./resources/sessions/SessionList";
 import { SessionCreate } from "./resources/sessions/SessionCreate";
 import { SessionEdit } from "./resources/sessions/SessionEdit";
 import { SessionShow } from "./resources/sessions/SessionShow";
+import { CustomLoginPage } from "./auth/CustomLoginPage";
 
 export const App = () => (
     <Admin
+        loginPage={CustomLoginPage}
         dataProvider={dataProvider}
         dashboard={AdminDashboard}
         authProvider={authProvider}
