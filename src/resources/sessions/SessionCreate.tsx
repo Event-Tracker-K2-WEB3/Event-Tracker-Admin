@@ -17,7 +17,7 @@ const sessionTypeChoices = [
 ];
 
 export const SessionCreate = () => (
-  <Create title="Create session">
+  <Create title="Create session" redirect="list">
     <SimpleForm>
       <TextInput source="title" label="Title" validate={required()} fullWidth />
 

@@ -24,7 +24,7 @@ const SessionTitle = () => {
 };
 
 export const SessionEdit = () => (
-  <Edit title={<SessionTitle />}>
+  <Edit title={<SessionTitle />} redirect="list">
     <SimpleForm>
       <TextInput source="title" label="Title" validate={required()} fullWidth />
 
