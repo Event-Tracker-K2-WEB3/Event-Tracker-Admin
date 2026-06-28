@@ -12,6 +12,8 @@ import {
   useRefresh,
 } from "react-admin";
 
+import "./SessionShow.css";
+
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 type Speaker = {
@@ -51,7 +53,13 @@ async function requestSessionSpeakerAssignment(
     throw new Error(message || "Unable to update speaker assignment");
   }
 
-  return response.json();
+  const text = await response.text();
+
+  if (!text) {
+    return null;
+  }
+
+  return JSON.parse(text);
 }
 
 const SpeakerAssignmentField = () => {
@@ -65,6 +73,7 @@ const SpeakerAssignmentField = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const assignedSpeakers: Speaker[] = record?.speakers || [];
+
   const assignedSpeakerIds = new Set(
     assignedSpeakers.map((speaker) => speaker.id)
   );
@@ -152,40 +161,41 @@ const SpeakerAssignmentField = () => {
   };
 
   return (
-    <div style={{ display: "grid", gap: "1rem", marginTop: "0.5rem" }}>
+    <div className="session-show-assignment">
       <div>
-        <strong>Assigned speakers</strong>
+        <p className="session-show-section-title">Assigned speakers</p>
 
         {assignedSpeakers.length === 0 ? (
-          <p style={{ marginTop: "0.5rem" }}>No speakers assigned</p>
+          <p className="session-empty">No speakers assigned</p>
         ) : (
-          <ul style={{ margin: "0.5rem 0 0", paddingLeft: "1.2rem" }}>
+          <ul className="session-speaker-list">
             {assignedSpeakers.map((speaker) => (
-              <li
-                key={speaker.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "0.75rem",
-                  marginBottom: "0.5rem",
-                }}
-              >
-                <span>
-                  {speaker.name} — {speaker.role}
-                </span>
+              <li key={speaker.id} className="session-speaker-item">
+                <div className="session-speaker-info">
+                  <div className="session-speaker-avatar">
+                    {speaker.photo ? (
+                      <img src={speaker.photo} alt={speaker.name} />
+                    ) : (
+                      <span>
+                        {speaker.initials || speaker.name.charAt(0)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div>
+                    <strong>{speaker.name}</strong>
+                    <span>
+                      {speaker.role}
+                      {speaker.company ? ` · ${speaker.company}` : ""}
+                    </span>
+                  </div>
+                </div>
 
                 <button
                   type="button"
+                  className="session-remove-button"
                   onClick={() => handleRemoveSpeaker(speaker.id)}
                   disabled={isSubmitting}
-                  style={{
-                    border: "1px solid #d32f2f",
-                    borderRadius: "6px",
-                    background: "transparent",
-                    color: "#d32f2f",
-                    cursor: "pointer",
-                    padding: "0.25rem 0.5rem",
-                  }}
                 >
                   Remove
                 </button>
@@ -195,52 +205,36 @@ const SpeakerAssignmentField = () => {
         )}
       </div>
 
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "0.75rem",
-          flexWrap: "wrap",
-        }}
-      >
-        <select
-          value={selectedSpeakerId}
-          onChange={(event) => setSelectedSpeakerId(event.target.value)}
-          disabled={isLoadingSpeakers || isSubmitting}
-          style={{
-            minWidth: "260px",
-            border: "1px solid #c4c4c4",
-            borderRadius: "6px",
-            padding: "0.55rem",
-          }}
-        >
-          <option value="">
-            {isLoadingSpeakers ? "Loading speakers..." : "Select a speaker"}
-          </option>
+      <div>
+        <p className="session-show-section-title">Assign a speaker</p>
 
-          {availableSpeakers.map((speaker) => (
-            <option key={speaker.id} value={speaker.id}>
-              {speaker.name} — {speaker.role}
+        <div className="session-assignment-form">
+          <select
+            className="session-assignment-select"
+            value={selectedSpeakerId}
+            onChange={(event) => setSelectedSpeakerId(event.target.value)}
+            disabled={isLoadingSpeakers || isSubmitting}
+          >
+            <option value="">
+              {isLoadingSpeakers ? "Loading speakers..." : "Select a speaker"}
             </option>
-          ))}
-        </select>
 
-        <button
-          type="button"
-          onClick={handleAssignSpeaker}
-          disabled={!selectedSpeakerId || isSubmitting}
-          style={{
-            border: "none",
-            borderRadius: "6px",
-            background: "#673ab7",
-            color: "#ffffff",
-            cursor: "pointer",
-            padding: "0.6rem 1rem",
-            opacity: !selectedSpeakerId || isSubmitting ? 0.6 : 1,
-          }}
-        >
-          {isSubmitting ? "Saving..." : "Assign speaker"}
-        </button>
+            {availableSpeakers.map((speaker) => (
+              <option key={speaker.id} value={speaker.id}>
+                {speaker.name} — {speaker.role}
+              </option>
+            ))}
+          </select>
+
+          <button
+            type="button"
+            className="session-assign-button"
+            onClick={handleAssignSpeaker}
+            disabled={!selectedSpeakerId || isSubmitting}
+          >
+            {isSubmitting ? "Saving..." : "Assign speaker"}
+          </button>
+        </div>
       </div>
     </div>
   );
