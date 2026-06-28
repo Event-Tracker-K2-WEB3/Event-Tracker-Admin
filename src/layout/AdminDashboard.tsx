@@ -33,6 +33,28 @@ type DashboardSpeakerSummary = {
   initials: string;
 };
 
+type DashboardEventSummary = {
+  id: string;
+  title: string;
+  description: string;
+  startDate: string;
+  endDate: string;
+  location: string;
+  sessionCount: number;
+};
+
+type DashboardEventSessionCount = {
+  eventId: string;
+  eventTitle: string;
+  sessions: number;
+};
+
+type DashboardRoomUsage = {
+  roomId: number;
+  roomName: string;
+  sessions: number;
+};
+
 type DashboardResponse = {
   totalEvents: number;
   totalSessions: number;
@@ -40,6 +62,9 @@ type DashboardResponse = {
   totalRooms: number;
   liveSessions: number;
   sessionsByDay: DashboardChartPoint[];
+  upcomingEvents: DashboardEventSummary[];
+  sessionsByEvent: DashboardEventSessionCount[];
+  roomUsage: DashboardRoomUsage[];
   upcomingSessions: DashboardSessionSummary[];
   latestSessions: DashboardSessionSummary[];
   latestSpeakers: DashboardSpeakerSummary[];
@@ -121,7 +146,7 @@ function SessionsLineChart({ data }: { data: DashboardChartPoint[] }) {
           <p className="dashboard-eyebrow">Analytics</p>
           <h2>Sessions overview</h2>
         </div>
-        <span className="dashboard-pill">Last 7 days</span>
+        <span className="dashboard-pill">Next 7 days</span>
       </div>
 
       <svg className="dashboard-chart" viewBox="0 0 640 220" role="img">
@@ -190,6 +215,100 @@ function SpeakerRow({ speaker }: { speaker: DashboardSpeakerSummary }) {
 
       <span>{speaker.specialty}</span>
     </div>
+  );
+}
+
+function UpcomingEventCard({ event }: { event: DashboardEventSummary }) {
+  return (
+    <article className="dashboard-event-card">
+      <div>
+        <h3>{event.title}</h3>
+        <p>{event.location}</p>
+        <span>
+          {formatDateTime(event.startDate)} · {event.sessionCount} session
+          {event.sessionCount > 1 ? "s" : ""}
+        </span>
+      </div>
+
+      <span className="dashboard-status">Upcoming</span>
+    </article>
+  );
+}
+
+function SessionsByEventChart({
+  data,
+}: {
+  data: DashboardEventSessionCount[];
+}) {
+  const max = Math.max(...data.map((item) => item.sessions), 1);
+
+  return (
+    <section className="dashboard-panel">
+      <div className="dashboard-panel-header">
+        <div>
+          <p className="dashboard-eyebrow">Events</p>
+          <h2>Sessions by event</h2>
+        </div>
+      </div>
+
+      <div className="dashboard-bar-list">
+        {data.length > 0 ? (
+          data.map((item) => (
+            <div className="dashboard-bar-row" key={item.eventId}>
+              <div className="dashboard-bar-label">
+                <span>{item.eventTitle}</span>
+                <strong>{item.sessions}</strong>
+              </div>
+
+              <div className="dashboard-bar-track">
+                <div
+                  className="dashboard-bar-fill"
+                  style={{ width: `${(item.sessions / max) * 100}%` }}
+                />
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="dashboard-empty">No sessions linked to events.</p>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function RoomUsagePanel({ data }: { data: DashboardRoomUsage[] }) {
+  const max = Math.max(...data.map((item) => item.sessions), 1);
+
+  return (
+    <section className="dashboard-panel">
+      <div className="dashboard-panel-header">
+        <div>
+          <p className="dashboard-eyebrow">Rooms</p>
+          <h2>Room usage</h2>
+        </div>
+      </div>
+
+      <div className="dashboard-room-list">
+        {data.length > 0 ? (
+          data.map((room) => (
+            <div className="dashboard-room-row" key={room.roomId}>
+              <div>
+                <strong>{room.roomName}</strong>
+                <p>
+                  {room.sessions} session{room.sessions > 1 ? "s" : ""}
+                </p>
+              </div>
+
+              <div className="dashboard-room-meter">
+                <span style={{ width: `${(room.sessions / max) * 100}%` }} />
+              </div>
+            </div>
+          ))
+        ) : (
+          <p className="dashboard-empty">No room usage yet.</p>
+        )}
+      </div>
+    </section>
   );
 }
 
@@ -313,6 +432,31 @@ export function AdminDashboard() {
       </section>
 
       <section className="dashboard-bottom-grid">
+        <section className="dashboard-panel">
+          <div className="dashboard-panel-header">
+            <div>
+              <p className="dashboard-eyebrow">Events</p>
+              <h2>Upcoming events</h2>
+            </div>
+          </div>
+
+          <div className="dashboard-list">
+            {dashboard.upcomingEvents.length > 0 ? (
+              dashboard.upcomingEvents.map((event) => (
+                <UpcomingEventCard key={event.id} event={event} />
+              ))
+            ) : (
+              <p className="dashboard-empty">No upcoming events.</p>
+            )}
+          </div>
+        </section>
+
+        <SessionsByEventChart data={dashboard.sessionsByEvent} />
+
+        <RoomUsagePanel data={dashboard.roomUsage} />
+      </section>
+
+      <section className="dashboard-bottom-grid dashboard-bottom-grid-secondary">
         <section className="dashboard-panel">
           <div className="dashboard-panel-header">
             <div>
