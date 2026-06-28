@@ -45,7 +45,13 @@ async function httpClient(url: string, options: RequestInit = {}) {
     return null;
   }
 
-  return response.json();
+  const text = await response.text();
+
+  if (!text) {
+    return null;
+  }
+
+  return JSON.parse(text);
 }
 
 function toIsoDateTime(value: unknown) {
@@ -155,12 +161,7 @@ function buildListUrl(
   const safePage = Math.max(page || 1, 1);
   const safePerPage = Math.max(perPage || 10, 1);
 
-  /*
-    Important:
-    EventService côté backend fait déjà PageRequest.of(page - 1, size).
-    Donc côté React Admin, on envoie page=1, page=2, etc.
-    On n'envoie pas page - 1 ici.
-  */
+
   params.set("page", String(safePage));
   params.set("size", String(safePerPage));
 
