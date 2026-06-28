@@ -1,0 +1,297 @@
+.room-detail-page,
+.room-form-page {
+  position: relative;
+  min-height: calc(100vh - 96px);
+  padding: 2.3rem 2.5rem 2.75rem;
+  overflow: hidden;
+  color: #f8fafc;
+}
+
+.room-detail-page::before,
+.room-form-page::before {
+  content: "";
+  position: absolute;
+  inset: -18% -8% auto auto;
+  width: 520px;
+  height: 520px;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, rgba(124, 58, 237, 0.22), transparent 62%),
+    radial-gradient(circle at 70% 35%, rgba(14, 165, 233, 0.12), transparent 54%);
+  filter: blur(2px);
+}
+
+.room-detail-orb {
+  position: absolute;
+  border-radius: 999px;
+  pointer-events: none;
+  opacity: 0.55;
+}
+
+.room-detail-orb--one {
+  left: -120px;
+  bottom: -160px;
+  width: 360px;
+  height: 360px;
+  border: 1px solid rgba(139, 92, 246, 0.28);
+  box-shadow:
+    0 0 80px rgba(124, 58, 237, 0.28),
+    inset 0 0 80px rgba(124, 58, 237, 0.12);
+}
+
+.room-detail-orb--two {
+  right: 11%;
+  top: -90px;
+  width: 160px;
+  height: 160px;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.22), transparent 68%);
+}
+
+.room-detail-hero,
+.room-detail-grid,
+.room-form-header,
+.room-form-shell {
+  position: relative;
+  z-index: 1;
+}
+
+.room-detail-hero {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  padding: 1.4rem;
+  border: 1px solid rgba(139, 92, 246, 0.34);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.82), rgba(2, 6, 23, 0.62)),
+    rgba(15, 23, 42, 0.72);
+  box-shadow:
+    0 24px 74px rgba(2, 6, 23, 0.34),
+    0 0 42px rgba(124, 58, 237, 0.1);
+  animation: roomFormFadeUp 600ms ease both;
+}
+
+.room-detail-icon {
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  border-radius: 26px;
+  color: #ffffff;
+  background:
+    linear-gradient(135deg, #7c3aed, #9333ea),
+    #7c3aed;
+  box-shadow: 0 18px 46px rgba(124, 58, 237, 0.34);
+}
+
+.room-detail-icon svg {
+  font-size: 2.2rem;
+}
+
+.room-detail-eyebrow {
+  margin: 0 0 0.45rem;
+  color: #8b5cf6;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.room-detail-main h1,
+.room-form-header h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(2rem, 3vw, 2.65rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.room-detail-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+}
+
+.room-detail-meta span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 0.75rem;
+  border: 1px solid rgba(139, 92, 246, 0.22);
+  border-radius: 999px;
+  color: rgba(226, 232, 240, 0.76);
+  background: rgba(124, 58, 237, 0.1);
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.room-detail-grid,
+.room-form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.room-detail-panel,
+.room-form-panel {
+  overflow: hidden;
+  padding: 1.25rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.8), rgba(2, 6, 23, 0.6)),
+    rgba(15, 23, 42, 0.65);
+  box-shadow: 0 22px 54px rgba(2, 6, 23, 0.22);
+  animation: roomFormFadeUp 640ms ease both;
+}
+
+.room-panel-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.room-panel-heading svg {
+  color: #a78bfa;
+}
+
+.room-panel-heading span {
+  color: rgba(226, 232, 240, 0.48);
+  font-size: 0.84rem;
+}
+
+.room-panel-title {
+  margin: 0 0 1rem;
+  color: #c4b5fd;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.room-panel-heading .room-panel-title {
+  margin-bottom: 0.25rem;
+}
+
+.room-info-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.room-info-list div {
+  padding: 0.9rem;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.46);
+}
+
+.room-info-list span {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: rgba(226, 232, 240, 0.44);
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.room-info-list strong {
+  color: #ffffff;
+  font-size: 0.92rem;
+}
+
+.room-form-header {
+  margin-bottom: 1.4rem;
+}
+
+.room-form-header span {
+  display: block;
+  margin-top: 0.7rem;
+  color: rgba(226, 232, 240, 0.72);
+  font-size: 0.98rem;
+}
+
+.room-form-shell {
+  overflow: hidden;
+  border: 1px solid rgba(139, 92, 246, 0.34);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.82), rgba(2, 6, 23, 0.62)),
+    rgba(15, 23, 42, 0.72);
+  box-shadow:
+    0 24px 74px rgba(2, 6, 23, 0.34),
+    0 0 42px rgba(124, 58, 237, 0.1);
+}
+
+.room-form-shell .RaSimpleForm-root {
+  padding: 1.2rem;
+}
+
+.room-form-panel .MuiFormControl-root {
+  margin-bottom: 1rem;
+}
+
+.room-form-panel .MuiInputBase-root,
+.room-form-panel .MuiFilledInput-root,
+.room-form-panel .MuiOutlinedInput-root {
+  color: #ffffff;
+  border-radius: 14px;
+  background: rgba(15, 23, 42, 0.72);
+}
+
+.room-form-panel .MuiInputLabel-root,
+.room-form-panel .MuiFormHelperText-root {
+  color: rgba(226, 232, 240, 0.56);
+}
+
+.room-form-panel .MuiInputBase-input {
+  color: #ffffff;
+}
+
+.room-form-toolbar {
+  margin-top: 1rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  background: transparent !important;
+}
+
+.room-form-toolbar .RaSaveButton-root {
+  min-height: 44px;
+  padding: 0 1.15rem;
+  border-radius: 13px;
+  color: #ffffff;
+  background: linear-gradient(135deg, #7c3aed, #9333ea);
+  box-shadow: 0 18px 42px rgba(124, 58, 237, 0.32);
+  text-transform: none;
+  font-weight: 850;
+}
+
+@keyframes roomFormFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 760px) {
+  .room-detail-page,
+  .room-form-page {
+    padding: 1.5rem 1rem 2rem;
+  }
+
+  .room-detail-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .room-info-list {
+    grid-template-columns: 1fr;
+  }
+}

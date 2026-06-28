@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import {
-  BooleanField,
-  DateField,
-  FunctionField,
-  NumberField,
+  EditButton,
   Show,
-  SimpleShowLayout,
-  TextField,
+  TopToolbar,
   useNotify,
   useRecordContext,
   useRefresh,
 } from "react-admin";
+import AccessTimeIcon from "@mui/icons-material/AccessTime";
+import EventIcon from "@mui/icons-material/Event";
+import GroupsIcon from "@mui/icons-material/Groups";
+import MeetingRoomIcon from "@mui/icons-material/MeetingRoom";
+import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 
-import "./SessionShow.css";
+import "./SessionForm.css";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
@@ -26,6 +27,24 @@ type Speaker = {
   initials?: string;
 };
 
+type SessionRecord = {
+  id?: number;
+  title?: string;
+  description?: string | null;
+  type?: string;
+  image?: string | null;
+  startTime?: string;
+  endTime?: string;
+  capacity?: number;
+  eventId?: string;
+  eventTitle?: string;
+  roomId?: number;
+  roomName?: string;
+  live?: boolean;
+  speakerCount?: number;
+  speakers?: Speaker[];
+};
+
 function getAuthHeaders(): HeadersInit {
   const token = localStorage.getItem("eventsync_admin_token");
 
@@ -33,6 +52,36 @@ function getAuthHeaders(): HeadersInit {
     "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
+}
+
+function formatDateTime(value?: string) {
+  if (!value) return "—";
+
+  return new Intl.DateTimeFormat("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
+
+function getPhotoSrc(photo?: string | null) {
+  if (!photo) return undefined;
+  if (photo.startsWith("http")) return photo;
+  return `${API_URL}${photo}`;
+}
+
+function getInitials(speaker?: Speaker) {
+  if (speaker?.initials) return speaker.initials;
+  if (!speaker?.name) return "?";
+
+  return speaker.name
+    .split(" ")
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((word) => word.charAt(0).toUpperCase())
+    .join("");
 }
 
 async function requestSessionSpeakerAssignment(
@@ -62,8 +111,14 @@ async function requestSessionSpeakerAssignment(
   return JSON.parse(text);
 }
 
-const SpeakerAssignmentField = () => {
-  const record = useRecordContext();
+const SessionShowActions = () => (
+  <TopToolbar>
+    <EditButton />
+  </TopToolbar>
+);
+
+function SpeakerAssignmentPanel() {
+  const record = useRecordContext<SessionRecord>();
   const notify = useNotify();
   const refresh = useRefresh();
 
@@ -72,8 +127,7 @@ const SpeakerAssignmentField = () => {
   const [isLoadingSpeakers, setIsLoadingSpeakers] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const assignedSpeakers: Speaker[] = record?.speakers || [];
-
+  const assignedSpeakers = record?.speakers || [];
   const assignedSpeakerIds = new Set(
     assignedSpeakers.map((speaker) => speaker.id)
   );
@@ -116,9 +170,7 @@ const SpeakerAssignmentField = () => {
   }, [notify]);
 
   const handleAssignSpeaker = async () => {
-    if (!record?.id || !selectedSpeakerId) {
-      return;
-    }
+    if (!record?.id || !selectedSpeakerId) return;
 
     try {
       setIsSubmitting(true);
@@ -141,9 +193,7 @@ const SpeakerAssignmentField = () => {
   };
 
   const handleRemoveSpeaker = async (speakerId: number) => {
-    if (!record?.id) {
-      return;
-    }
+    if (!record?.id) return;
 
     try {
       setIsSubmitting(true);
@@ -161,24 +211,31 @@ const SpeakerAssignmentField = () => {
   };
 
   return (
-    <div className="session-show-assignment">
-      <div>
-        <p className="session-show-section-title">Assigned speakers</p>
+    <article className="session-detail-panel session-detail-panel--large">
+      <div className="session-panel-header">
+        <div>
+          <p className="session-panel-title">Speakers assignment</p>
+          <span>Assign or remove speakers linked to this session.</span>
+        </div>
 
-        {assignedSpeakers.length === 0 ? (
-          <p className="session-empty">No speakers assigned</p>
-        ) : (
-          <ul className="session-speaker-list">
-            {assignedSpeakers.map((speaker) => (
+        <PersonAddAltIcon />
+      </div>
+
+      {assignedSpeakers.length === 0 ? (
+        <p className="session-muted">No speakers assigned yet.</p>
+      ) : (
+        <ul className="session-speaker-list">
+          {assignedSpeakers.map((speaker) => {
+            const photoSrc = getPhotoSrc(speaker.photo);
+
+            return (
               <li key={speaker.id} className="session-speaker-item">
                 <div className="session-speaker-info">
                   <div className="session-speaker-avatar">
-                    {speaker.photo ? (
-                      <img src={speaker.photo} alt={speaker.name} />
+                    {photoSrc ? (
+                      <img src={photoSrc} alt={speaker.name} />
                     ) : (
-                      <span>
-                        {speaker.initials || speaker.name.charAt(0)}
-                      </span>
+                      <span>{getInitials(speaker)}</span>
                     )}
                   </div>
 
@@ -200,65 +257,131 @@ const SpeakerAssignmentField = () => {
                   Remove
                 </button>
               </li>
-            ))}
-          </ul>
-        )}
-      </div>
+            );
+          })}
+        </ul>
+      )}
 
-      <div>
-        <p className="session-show-section-title">Assign a speaker</p>
+      <div className="session-assignment-form">
+        <select
+          className="session-assignment-select"
+          value={selectedSpeakerId}
+          onChange={(event) => setSelectedSpeakerId(event.target.value)}
+          disabled={isLoadingSpeakers || isSubmitting}
+        >
+          <option value="">
+            {isLoadingSpeakers ? "Loading speakers..." : "Select a speaker"}
+          </option>
 
-        <div className="session-assignment-form">
-          <select
-            className="session-assignment-select"
-            value={selectedSpeakerId}
-            onChange={(event) => setSelectedSpeakerId(event.target.value)}
-            disabled={isLoadingSpeakers || isSubmitting}
-          >
-            <option value="">
-              {isLoadingSpeakers ? "Loading speakers..." : "Select a speaker"}
+          {availableSpeakers.map((speaker) => (
+            <option key={speaker.id} value={speaker.id}>
+              {speaker.name} — {speaker.role}
             </option>
+          ))}
+        </select>
 
-            {availableSpeakers.map((speaker) => (
-              <option key={speaker.id} value={speaker.id}>
-                {speaker.name} — {speaker.role}
-              </option>
-            ))}
-          </select>
+        <button
+          type="button"
+          className="session-assign-button"
+          onClick={handleAssignSpeaker}
+          disabled={!selectedSpeakerId || isSubmitting}
+        >
+          {isSubmitting ? "Saving..." : "Assign speaker"}
+        </button>
+      </div>
+    </article>
+  );
+}
 
-          <button
-            type="button"
-            className="session-assign-button"
-            onClick={handleAssignSpeaker}
-            disabled={!selectedSpeakerId || isSubmitting}
-          >
-            {isSubmitting ? "Saving..." : "Assign speaker"}
-          </button>
+function SessionShowContent() {
+  const record = useRecordContext<SessionRecord>();
+
+  if (!record) {
+    return null;
+  }
+
+  return (
+    <section className="session-detail-page">
+      <div className="session-detail-orb session-detail-orb--one" />
+      <div className="session-detail-orb session-detail-orb--two" />
+
+      <div className="session-detail-hero">
+        <div className="session-detail-icon">
+          <GroupsIcon />
+        </div>
+
+        <div className="session-detail-main">
+          <p className="session-detail-eyebrow">Session details</p>
+          <h1>{record.title || "Untitled session"}</h1>
+
+          <div className="session-detail-meta">
+            <span>{record.type || "No type"}</span>
+            <span>{record.eventTitle || "No event"}</span>
+            <span>{record.roomName || "No room"}</span>
+            <span className={record.live ? "is-live" : ""}>
+              {record.live ? "Live" : "Offline"}
+            </span>
+          </div>
+        </div>
+
+        <div className="session-detail-count-card">
+          <strong>{record.speakerCount || 0}</strong>
+          <span>{(record.speakerCount || 0) <= 1 ? "Speaker" : "Speakers"}</span>
         </div>
       </div>
-    </div>
+
+      <div className="session-detail-grid">
+        <article className="session-detail-panel">
+          <p className="session-panel-title">Description</p>
+          <p className="session-description">
+            {record.description || "No description provided for this session."}
+          </p>
+        </article>
+
+        <article className="session-detail-panel">
+          <div className="session-info-row">
+            <EventIcon />
+            <div>
+              <span>Event</span>
+              <strong>{record.eventTitle || "—"}</strong>
+            </div>
+          </div>
+
+          <div className="session-info-row">
+            <MeetingRoomIcon />
+            <div>
+              <span>Room</span>
+              <strong>{record.roomName || "—"}</strong>
+            </div>
+          </div>
+
+          <div className="session-info-row">
+            <AccessTimeIcon />
+            <div>
+              <span>Start</span>
+              <strong>{formatDateTime(record.startTime)}</strong>
+            </div>
+          </div>
+
+          <div className="session-info-row">
+            <AccessTimeIcon />
+            <div>
+              <span>End</span>
+              <strong>{formatDateTime(record.endTime)}</strong>
+            </div>
+          </div>
+        </article>
+
+        <SpeakerAssignmentPanel />
+      </div>
+    </section>
   );
-};
+}
 
-export const SessionShow = () => (
-  <Show title="Session details">
-    <SimpleShowLayout>
-      <TextField source="id" label="ID" />
-      <TextField source="title" label="Title" />
-      <TextField source="description" label="Description" />
-      <TextField source="type" label="Type" />
-      <TextField source="eventTitle" label="Event" />
-      <TextField source="roomName" label="Room" />
-      <DateField source="startTime" label="Start time" showTime />
-      <DateField source="endTime" label="End time" showTime />
-      <NumberField source="capacity" label="Capacity" />
-      <TextField source="image" label="Image" />
-      <BooleanField source="live" label="Live" />
-
-      <FunctionField
-        label="Speakers"
-        render={() => <SpeakerAssignmentField />}
-      />
-    </SimpleShowLayout>
-  </Show>
-);
+export function SessionShow() {
+  return (
+    <Show title="Session details" actions={<SessionShowActions />}>
+      <SessionShowContent />
+    </Show>
+  );
+}
