@@ -29,6 +29,7 @@ import { SessionCreate } from "./resources/sessions/SessionCreate";
 import { SessionEdit } from "./resources/sessions/SessionEdit";
 import { SessionShow } from "./resources/sessions/SessionShow";
 import { CustomLoginPage } from "./auth/CustomLoginPage";
+import { EventShow } from "./resources/events/EventShow";
 
 export const App = () => (
     <Admin
@@ -39,7 +40,14 @@ export const App = () => (
         layout={AdminLayout}
         theme={eventSyncTheme}
     >
-        <Resource name="events" list={EventList} create={EventCreate} edit={EventEdit} icon={EventIcon} />
+        <Resource
+        name="events"
+        list={EventList}
+        create={EventCreate}
+        edit={EventEdit}
+        show={EventShow}
+        icon={EventIcon}
+        />
 
         <Resource name="rooms" list={RoomList} create={RoomCreate} edit={RoomEdit} icon={MeetingRoomIcon} />
 
