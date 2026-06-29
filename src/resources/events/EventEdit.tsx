@@ -7,6 +7,8 @@ import {
   TextInput,
   Toolbar,
   useRecordContext,
+  ImageInput,
+  ImageField,
 } from "react-admin";
 
 import "./EventForm.css";
@@ -57,6 +59,15 @@ export function EventEdit() {
                   validate={required()}
                   fullWidth
                 />
+
+                <ImageInput
+                  source="imageFile"
+                  label="Event image"
+                  accept={{ "image/*": [] }}
+                  multiple={false}
+                >
+                  <ImageField source="src" title="title" />
+                </ImageInput>
 
                 <TextInput
                   source="description"

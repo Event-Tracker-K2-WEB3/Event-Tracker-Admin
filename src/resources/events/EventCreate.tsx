@@ -6,6 +6,8 @@ import {
   SimpleForm,
   TextInput,
   Toolbar,
+  ImageInput,
+  ImageField,
 } from "react-admin";
 
 import "./EventForm.css";
@@ -45,6 +47,10 @@ export function EventCreate() {
                   validate={required()}
                   fullWidth
                 />
+
+                <ImageInput source="imageFile" label="Event image" accept={{ 'image/*': [] }}>
+                  <ImageField source="src" title="title" />
+                </ImageInput>
 
                 <TextInput
                   source="description"
