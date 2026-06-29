@@ -1,0 +1,297 @@
+.admin-topbar {
+  background:
+    linear-gradient(90deg, rgba(2, 6, 23, 0.98), rgba(15, 23, 42, 0.94)),
+    #020617 !important;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow: 0 18px 48px rgba(2, 6, 23, 0.35) !important;
+}
+
+.admin-topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.admin-topbar-logo {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: #c4b5fd;
+  background:
+    linear-gradient(135deg, rgba(124, 58, 237, 0.28), rgba(14, 165, 233, 0.1)),
+    rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(167, 139, 250, 0.28);
+  box-shadow: 0 0 24px rgba(124, 58, 237, 0.24);
+}
+
+.admin-sidebar {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 64px);
+  overflow: hidden;
+  padding: 0.85rem 0.7rem;
+  color: #f8fafc;
+  background:
+    radial-gradient(circle at 10% 12%, rgba(124, 58, 237, 0.2), transparent 34%),
+    radial-gradient(circle at 120% 90%, rgba(59, 130, 246, 0.12), transparent 34%),
+    linear-gradient(180deg, #020617 0%, #07111f 52%, #030712 100%);
+  border-right: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.admin-sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.022) 1px, transparent 1px);
+  background-size: 54px 54px;
+  mask-image: linear-gradient(to bottom, black, transparent 82%);
+}
+
+.admin-sidebar-glow--bottom {
+  position: absolute;
+  right: -130px;
+  bottom: -110px;
+  width: 260px;
+  height: 260px;
+  pointer-events: none;
+  border-radius: 999px;
+  border: 1px solid rgba(139, 92, 246, 0.2);
+  box-shadow:
+    0 0 80px rgba(124, 58, 237, 0.22),
+    inset 0 0 70px rgba(124, 58, 237, 0.08);
+}
+
+.admin-sidebar-nav {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.admin-sidebar-link {
+  position: relative;
+  overflow: hidden;
+  min-height: 46px !important;
+  margin: 0 !important;
+  padding: 0 0.75rem !important;
+  border: 1px solid transparent !important;
+  border-radius: 14px !important;
+  color: rgba(226, 232, 240, 0.68) !important;
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    color 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.admin-sidebar-link::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #8b5cf6, #22d3ee);
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+
+.admin-sidebar-link:hover {
+  transform: translateX(4px);
+  color: #ffffff !important;
+  border-color: rgba(167, 139, 250, 0.18) !important;
+  background: rgba(124, 58, 237, 0.1) !important;
+}
+
+.admin-sidebar-link.Mui-selected,
+.admin-sidebar-link.RaMenuItemLink-active {
+  color: #ffffff !important;
+  border-color: rgba(167, 139, 250, 0.34) !important;
+  background:
+    linear-gradient(90deg, rgba(124, 58, 237, 0.28), rgba(124, 58, 237, 0.08)),
+    rgba(15, 23, 42, 0.7) !important;
+  box-shadow:
+    0 12px 32px rgba(124, 58, 237, 0.18),
+    inset 0 0 24px rgba(124, 58, 237, 0.08);
+}
+
+.admin-sidebar-link.Mui-selected::before,
+.admin-sidebar-link.RaMenuItemLink-active::before {
+  opacity: 1;
+}
+
+.admin-sidebar-link .MuiListItemIcon-root {
+  min-width: 38px !important;
+  color: inherit !important;
+}
+
+.admin-sidebar-link .MuiSvgIcon-root {
+  padding: 0.35rem;
+  border-radius: 11px;
+  background: rgba(15, 23, 42, 0.42);
+  color: inherit;
+  box-sizing: content-box;
+  transition:
+    background 180ms ease,
+    box-shadow 180ms ease,
+    color 180ms ease;
+}
+
+.admin-sidebar-link:hover .MuiSvgIcon-root,
+.admin-sidebar-link.Mui-selected .MuiSvgIcon-root,
+.admin-sidebar-link.RaMenuItemLink-active .MuiSvgIcon-root {
+  color: #c4b5fd;
+  background: rgba(124, 58, 237, 0.22);
+  box-shadow: 0 0 18px rgba(124, 58, 237, 0.18);
+}
+
+.admin-sidebar-link .MuiTypography-root {
+  font-size: 0.9rem !important;
+  font-weight: 800 !important;
+}
+
+.admin-sidebar-logout {
+  position: absolute;
+  z-index: 2;
+  left: 0.7rem;
+  right: 0.7rem;
+  bottom: 1rem;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0 0.85rem;
+  border: 1px solid rgba(248, 113, 113, 0.28);
+  border-radius: 14px;
+  color: #fecaca;
+  background:
+    linear-gradient(90deg, rgba(239, 68, 68, 0.13), rgba(124, 58, 237, 0.06)),
+    rgba(15, 23, 42, 0.54);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 850;
+  transition:
+    transform 180ms ease,
+    background 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.admin-sidebar-logout:hover {
+  transform: translateX(4px);
+  border-color: rgba(248, 113, 113, 0.44);
+  background: rgba(239, 68, 68, 0.16);
+  box-shadow: 0 14px 34px rgba(239, 68, 68, 0.12);
+}
+
+/* React Admin sidebar fixes */
+.RaSidebar-docked,
+.RaSidebar-paper {
+  background: transparent !important;
+  border-right: 0 !important;
+}
+
+.RaLayout-content {
+  background: #020617 !important;
+}
+
+/* closed sidebar */
+.RaSidebar-closed .admin-sidebar {
+  padding-inline: 0.45rem;
+}
+
+.RaSidebar-closed .admin-sidebar-link {
+  justify-content: center !important;
+  padding: 0 !important;
+}
+
+.RaSidebar-closed .admin-sidebar-link .MuiListItemIcon-root {
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+.RaSidebar-closed .admin-sidebar-link .MuiTypography-root {
+  display: none !important;
+}
+
+.RaSidebar-closed .admin-sidebar-logout {
+  left: 0.45rem;
+  right: 0.45rem;
+  justify-content: center;
+  padding: 0;
+}
+
+.RaSidebar-closed .admin-sidebar-logout span {
+  display: none;
+}
+
+/* remove visual gap between sidebar and content */
+.RaLayout-root .RaLayout-content,
+.RaLayout-content {
+  margin-left: 0 !important;
+}
+
+:root {
+  --admin-sidebar-open-width: 160px;
+  --admin-sidebar-closed-width: 56px;
+}
+
+/* Force React Admin sidebar width */
+.RaSidebar-docked,
+.RaSidebar-paper,
+.RaSidebar-open,
+.RaSidebar-docked .MuiDrawer-paper {
+  width: var(--admin-sidebar-open-width) !important;
+  min-width: var(--admin-sidebar-open-width) !important;
+  max-width: var(--admin-sidebar-open-width) !important;
+}
+
+/* Force collapsed sidebar width */
+.RaSidebar-closed,
+.RaSidebar-closed .RaSidebar-paper,
+.RaSidebar-closed .MuiDrawer-paper {
+  width: var(--admin-sidebar-closed-width) !important;
+  min-width: var(--admin-sidebar-closed-width) !important;
+  max-width: var(--admin-sidebar-closed-width) !important;
+}
+
+/* Make the custom sidebar fill exactly the drawer width */
+.admin-sidebar {
+  position: relative;
+  width: 100% !important;
+  box-sizing: border-box;
+  min-height: calc(100vh - 64px);
+  overflow: hidden;
+  padding: 0.85rem 0.7rem;
+  color: #f8fafc;
+  background:
+    radial-gradient(circle at 10% 12%, rgba(124, 58, 237, 0.2), transparent 34%),
+    radial-gradient(circle at 120% 90%, rgba(59, 130, 246, 0.12), transparent 34%),
+    linear-gradient(180deg, #020617 0%, #07111f 52%, #030712 100%);
+  border-right: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+/* Remove the dark empty reserved area */
+.RaLayout-content,
+.RaLayout-root .RaLayout-content {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Make main content start immediately after sidebar */
+.RaLayout-root main {
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+/* Avoid extra default drawer spacing */
+.MuiDrawer-paper {
+  overflow-x: hidden !important;
+}
