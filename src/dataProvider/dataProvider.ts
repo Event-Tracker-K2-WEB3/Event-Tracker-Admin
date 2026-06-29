@@ -206,22 +206,66 @@ export const dataProvider: DataProvider = {
   },
 
   create: async (resource, params) => {
-    try {
-      const data = transformData(params.data, resource);
+  try {
+    if (resource === "events") {
+      const imageFileValue = params.data.imageFile;
+      const uploadedImage = Array.isArray(imageFileValue)
+        ? imageFileValue[0]
+        : imageFileValue;
 
-      const response = await httpClient(`${API_URL}/${resource}`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      const rawFile = uploadedImage?.rawFile;
 
-      return {
-        data: response,
-      };
-    } catch (error) {
-      console.error(`Error creating ${resource}`, error);
-      throw error;
+      if (rawFile instanceof File) {
+        const token = localStorage.getItem("eventsync_admin_token");
+
+        const formData = new FormData();
+        formData.append("title", params.data.title);
+        formData.append("description", params.data.description || "");
+        formData.append("location", params.data.location);
+        formData.append("startDate", toIsoDateTime(params.data.startDate) as string);
+        formData.append("endDate", toIsoDateTime(params.data.endDate) as string);
+        formData.append("imageFile", rawFile);
+
+        const response = await fetch(`${API_URL}/events/upload`, {
+          method: "POST",
+          headers: {
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const message = await response.text();
+
+          throw new HttpError(
+            message || `HTTP error ${response.status}`,
+            response.status
+          );
+        }
+
+        const data = await response.json();
+
+        return {
+          data,
+        };
+      }
     }
-  },
+
+    const data = transformData(params.data, resource);
+
+    const response = await httpClient(`${API_URL}/${resource}`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+
+    return {
+      data: response,
+    };
+  } catch (error) {
+    console.error(`Error creating ${resource}`, error);
+    throw error;
+  }
+},
 
   update: async (resource, params) => {
     try {
